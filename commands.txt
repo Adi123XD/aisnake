@@ -1,0 +1,5 @@
+setup a venv -> python -m venv pygame
+ activate the venv in windows -> pygame\Scripts\activate
+
+ pip install -r requirements.txt
+ 
