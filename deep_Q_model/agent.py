@@ -5,6 +5,7 @@ from snake_game_ai import Direction,SnakeGameAI, Point
 from collections import deque
 from constants import *
 from model import Linear_QNet, QTrainer
+from helper import plot
 
 class Agent :
     def __init__(self):
@@ -67,7 +68,7 @@ class Agent :
         
     
     def remember(self, state , action , reward, next_state, done):
-        self.memory.append(state , action , reward, next_state, done)
+        self.memory.append((state , action , reward, next_state, done))
         
         # popleft if max memory is reached
     
@@ -77,16 +78,17 @@ class Agent :
         else :
             mini_sample = self.memory
         states , actions , rewards, next_states , dones = zip(*mini_sample)
-        self.trainer.train(states,actions,rewards,next_states,dones)
+        self.trainer.train_step(states,actions,rewards,next_states,dones)
     
     def train_short_memory(self,state , action , reward, next_state, done):
-        self.trainer.train(state , action , reward, next_state, done)
+        self.trainer.train_step(state , action , reward, next_state, done)
     
     def get_action(self, state):
         # random move : tradeoff  betweem exploration /exploitation
         self.epsilon = 80- self.n_games
+        final_move = [0,0,0]
         if(random.randint(0,200)< self.epsilon):
-            final_move = [0,0,0]
+            
             move = random.randint(0,2)
             final_move[move]=1
         else :
@@ -128,10 +130,14 @@ def train():
             
             if score>record:
                 record =score 
-                # agent.model.save()
+                agent.model.save()
                 
             print("Game : ", agent.n_games, "Score : ",score, "record : ",record)
-            # TODO: plot     
+            plot_scores.append(score)
+            total_score+=score
+            mean_score = total_score/agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)   
         
         
         
